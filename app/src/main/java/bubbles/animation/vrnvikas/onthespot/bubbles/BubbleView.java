@@ -2,6 +2,8 @@ package bubbles.animation.vrnvikas.onthespot.bubbles;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -20,6 +22,7 @@ class BubblesView extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder surfaceHolder;
     private float BUBBLE_FREQUENCY = 0.3f;
     private GameLoop gameLoop;
+    private Bitmap bubbleBitmap;
     private Paint backgroundPaint = new Paint();
 
     public BubblesView(Context context, AttributeSet attrs) {
@@ -30,6 +33,7 @@ class BubblesView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        bubbleBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.football);
         surfaceHolder = holder;
         surfaceHolder = holder;
         startAnimation();
@@ -53,7 +57,7 @@ class BubblesView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-
+    /*
     private void calculateDisplay(Canvas c) {
         randomlyAddBubbles(c.getWidth(), c.getHeight());
         LinkedList<Bubble> bubblesToRemove = new
@@ -67,16 +71,34 @@ class BubblesView extends SurfaceView implements SurfaceHolder.Callback {
             bubbles.remove(bubble);
         }
     }
+    */
 
-    public void randomlyAddBubbles(
-            int screenWidth,
-            int screenHeight) {
-        if (Math.random() > BUBBLE_FREQUENCY) return;
+    private void calculateDisplay(
+            Canvas c,
+            float numberOfFrames) {
+        randomlyAddBubbles(c.getWidth(),
+                c.getHeight(),
+                numberOfFrames);
+        LinkedList<Bubble> bubblesToRemove = new
+                LinkedList<Bubble>();
+        for (Bubble bubble : bubbles) {
+            bubble.move(numberOfFrames);
+            if (bubble.outOfRange())
+                bubblesToRemove.add(bubble);
+        }
+        for (Bubble bubble : bubblesToRemove) {
+            bubbles.remove(bubble);
+        }
+    }
+
+
+    public void randomlyAddBubbles(int screenWidth, int screenHeight,float numFrames) {
+        if (Math.random() > BUBBLE_FREQUENCY*numFrames) return;
         bubbles.add(
                 new Bubble(
                         (int) (screenWidth * Math.random()),
                         screenHeight + Bubble.RADIUS,
-                        (int) (Bubble.MAX_SPEED * Math.random())));
+                        (int) (Bubble.MAX_SPEED * Math.random()), bubbleBitmap));
     }
 
     public void startAnimation() {
@@ -113,6 +135,7 @@ class BubblesView extends SurfaceView implements SurfaceHolder.Callback {
         long frameTime = 0;
         //BubblesView view = new BubblesView();
 
+        /*
         public void run() {
             Canvas canvas = null;
             frameTime = System.currentTimeMillis();
@@ -130,6 +153,33 @@ class BubblesView extends SurfaceView implements SurfaceHolder.Callback {
                         surfaceHolder.unlockCanvasAndPost(canvas);
                 }
                 waitTillNextFrame();
+            }
+        }
+        */
+        public void run() {
+            Canvas canvas = null;
+            long thisFrameTime;
+            long lastFrameTime = System.currentTimeMillis();
+            float framesSinceLastFrame = 0;
+            final SurfaceHolder surfaceHolder =
+                    BubblesView.this.surfaceHolder;
+            while (running) {
+                try {
+                    canvas = surfaceHolder.lockCanvas();
+                    synchronized (surfaceHolder) {
+                        if (canvas != null) {
+                            drawScreen(canvas);
+                            calculateDisplay(canvas, framesSinceLastFrame);
+                        }
+                    }
+                } finally {
+                    if (canvas != null)
+                        surfaceHolder.unlockCanvasAndPost(canvas);
+                }
+                thisFrameTime = System.currentTimeMillis();
+                framesSinceLastFrame = (float)
+                        (thisFrameTime - lastFrameTime) / msPerFrame;
+                lastFrameTime = thisFrameTime;
             }
         }
 
