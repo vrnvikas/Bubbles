@@ -10,7 +10,6 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
 import java.util.LinkedList;
 
 /**
