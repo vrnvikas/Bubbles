@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
 import java.util.LinkedList;
 
 /**
@@ -33,7 +34,6 @@ class BubblesView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         bubbleBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.football);
-        surfaceHolder = holder;
         surfaceHolder = holder;
         startAnimation();
     }
@@ -72,32 +72,29 @@ class BubblesView extends SurfaceView implements SurfaceHolder.Callback {
     }
     */
 
-    private void calculateDisplay(
-            Canvas c,
-            float numberOfFrames) {
-        randomlyAddBubbles(c.getWidth(),
-                c.getHeight(),
-                numberOfFrames);
-        LinkedList<Bubble> bubblesToRemove = new
-                LinkedList<Bubble>();
+    private void calculateDisplay(Canvas c, float numberOfFrames) {
+        randomlyAddBubbles(c.getWidth(), c.getHeight(), numberOfFrames);
+        LinkedList<Bubble> bubblesToRemove = new LinkedList<Bubble>();
+
         for (Bubble bubble : bubbles) {
             bubble.move(numberOfFrames);
             if (bubble.outOfRange())
                 bubblesToRemove.add(bubble);
         }
+
         for (Bubble bubble : bubblesToRemove) {
             bubbles.remove(bubble);
         }
+
     }
 
 
-    public void randomlyAddBubbles(int screenWidth, int screenHeight,float numFrames) {
-        if (Math.random() > BUBBLE_FREQUENCY*numFrames) return;
-        bubbles.add(
-                new Bubble(
-                        (int) (screenWidth * Math.random()),
-                        screenHeight + Bubble.RADIUS,
-                        (int) (Bubble.MAX_SPEED * Math.random()), bubbleBitmap));
+    public void randomlyAddBubbles(int screenWidth, int screenHeight, float numFrames) {
+
+        if (Math.random() > BUBBLE_FREQUENCY * numFrames) return;
+
+        bubbles.add(new Bubble((int) (screenWidth * Math.random()), (int) (screenHeight * Math.random()),
+                (int) (Bubble.MAX_SPEED * Math.random()), (int) (Bubble.MAX_SPEED * Math.random()), bubbleBitmap));
     }
 
     public void startAnimation() {
@@ -160,8 +157,7 @@ class BubblesView extends SurfaceView implements SurfaceHolder.Callback {
             long thisFrameTime;
             long lastFrameTime = System.currentTimeMillis();
             float framesSinceLastFrame = 0;
-            final SurfaceHolder surfaceHolder =
-                    BubblesView.this.surfaceHolder;
+            final SurfaceHolder surfaceHolder = BubblesView.this.surfaceHolder;
             while (running) {
                 try {
                     canvas = surfaceHolder.lockCanvas();
@@ -176,8 +172,7 @@ class BubblesView extends SurfaceView implements SurfaceHolder.Callback {
                         surfaceHolder.unlockCanvasAndPost(canvas);
                 }
                 thisFrameTime = System.currentTimeMillis();
-                framesSinceLastFrame = (float)
-                        (thisFrameTime - lastFrameTime) / msPerFrame;
+                framesSinceLastFrame = (float) (thisFrameTime - lastFrameTime) / msPerFrame;
                 lastFrameTime = thisFrameTime;
             }
         }

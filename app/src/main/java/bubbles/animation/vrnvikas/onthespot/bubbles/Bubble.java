@@ -1,6 +1,5 @@
 package bubbles.animation.vrnvikas.onthespot.bubbles;
 
-
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,12 +11,16 @@ import android.graphics.RectF;
  */
 public class Bubble {
 
-    private float x, y, speed;
-    Bitmap bubbleBitmap;
+    private float x, y, speedy, speedx;
+    public Bitmap bubbleBitmap;
     private float amountOfWobble = 0;
     public static final float WOBBLE_RATE = 1 / 40;
     public static final int WOBBLE_AMOUNT = 3;
     private static final Paint bubblePaint = new Paint();
+    public static final int RADIUS = 10;
+    public static final int MAX_SPEED = 5;
+    public static final int MIN_SPEED = 1;
+    public Canvas c;
 
     static {
         bubblePaint.setStyle(Paint.Style.FILL);
@@ -26,18 +29,16 @@ public class Bubble {
         bubblePaint.setAntiAlias(true);
     }
 
-    public static final int RADIUS = 10;
-    public static final int MAX_SPEED = 10;
-    public static final int MIN_SPEED = 1;
-
-    public Bubble(float x, float y, float speed, Bitmap bubbleBitmap) {
+    public Bubble(float x, float y, float speedy, float speedx, Bitmap bubbleBitmap) {
         this.x = x;
         this.y = y;
         this.bubbleBitmap = bubbleBitmap;
-        this.speed = Math.max(speed, MIN_SPEED);
+        this.speedx = Math.max(speedx, MIN_SPEED);
+        this.speedy = Math.max(speedy, MIN_SPEED);
     }
 
     public void draw(Canvas c) {
+        this.c = c;
         //c.drawCircle(x, y, RADIUS, bubblePaint);
         //c.drawBitmap(bubbleBitmap, x-RADIUS, y-RADIUS, bubblePaint);
         c.drawOval(new RectF(
@@ -46,14 +47,21 @@ public class Bubble {
                         x + RADIUS + WOBBLE_AMOUNT * amountOfWobble,
                         y + RADIUS - WOBBLE_AMOUNT * amountOfWobble),
                 bubblePaint);
+
     }
 
     public void move(float numFrames) {
-        y -= speed*numFrames;
+        y -= speedy * numFrames;
+        x -= speedx * numFrames;
         amountOfWobble = (float) Math.sin(y * WOBBLE_RATE);
     }
 
     public boolean outOfRange() {
-        return (y + RADIUS < 0);
+
+        if (y + RADIUS < 0 || x + RADIUS < 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
