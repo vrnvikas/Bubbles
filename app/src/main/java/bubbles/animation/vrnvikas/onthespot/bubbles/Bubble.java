@@ -11,21 +11,22 @@ import android.graphics.RectF;
  */
 public class Bubble {
 
-    private float x, y, speedy, speedx;
+    public float x, y, speedy, speedx, xStart, yStart, xStop, yStop;
     public Bitmap bubbleBitmap;
     private float amountOfWobble = 0;
     public static final float WOBBLE_RATE = 1 / 40;
     public static final int WOBBLE_AMOUNT = 3;
     private static final Paint bubblePaint = new Paint();
-    public static final int RADIUS = 10;
+    public static final int RADIUS = 20;
     public static final int MAX_SPEED = 5;
     public static final int MIN_SPEED = 1;
-    public Canvas c;
+    public static final float MIN_DIST = 150;
+    public float currentDistance = 0;
 
     static {
         bubblePaint.setStyle(Paint.Style.FILL);
-        bubblePaint.setColor(Color.GREEN);
-        bubblePaint.setAlpha(66);
+        bubblePaint.setColor(Color.rgb(40,203,155));
+        //bubblePaint.setAlpha(80);
         bubblePaint.setAntiAlias(true);
     }
 
@@ -38,15 +39,19 @@ public class Bubble {
     }
 
     public void draw(Canvas c) {
-        this.c = c;
         //c.drawCircle(x, y, RADIUS, bubblePaint);
         //c.drawBitmap(bubbleBitmap, x-RADIUS, y-RADIUS, bubblePaint);
+
         c.drawOval(new RectF(
                         x - RADIUS - WOBBLE_AMOUNT * amountOfWobble,
                         y - RADIUS + WOBBLE_AMOUNT * amountOfWobble,
                         x + RADIUS + WOBBLE_AMOUNT * amountOfWobble,
                         y + RADIUS - WOBBLE_AMOUNT * amountOfWobble),
                 bubblePaint);
+
+
+        //c.drawRect(x, y, x + MIN_DIST, y + MIN_DIST, bubblePaint);
+        //c.drawLine(x, y, x + MIN_DIST, y + MIN_DIST, bubblePaint);
 
     }
 
@@ -64,4 +69,16 @@ public class Bubble {
             return false;
         }
     }
+
+    public boolean inRange(float xStart, float yStart, float xStop, float yStop) {
+
+        currentDistance = (float) Math.sqrt((Math.abs(xStop - xStart)) * (Math.abs(xStop - xStart))
+                + (Math.abs(yStop - yStart)) * (Math.abs(yStop - yStart)));
+        if (currentDistance < MIN_DIST) {
+            return true;
+        }
+
+        return false;
+    }
+
 }
